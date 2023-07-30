@@ -3,29 +3,34 @@ import org.apache.poi.EncryptedDocumentException;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriver; 
 import java.io.IOException;
 import java.util.Random;
 
 public class AQLTest {
 
     private static final Logger logger = Logger.getLogger(AQLTest.class.getName());
-    private static final String CHROME_DRIVER_ADDRESS = "C:/VSWorkspace/QIMA/AQLTest/webdriver/chromedriver.exe";
+    private static final String CHROME_DRIVER_ADDRESS = System.getProperty("user.dir")+"\\AQLTest\\webdriver\\chromedriver.exe";
     private static final String QIMA_TARGET_URL = "https://www.qima.com/aql-acceptable-quality-limit";
+    private static final String STRING_EMPTY = "";
+    private static final int LIMIT_RADOM_BOUND = 99999990;
 
     public static void main(String[] args) {
         // Set up the WebDriver
         System.setProperty("webdriver.chrome.driver", CHROME_DRIVER_ADDRESS);      
         ExecutionReport report = new ExecutionReport("AQL TEST");
+        WebDriver driver = null;
+        String browserIDHandler = "";
               
         // Repeat Steps 1 - 15 five times
         for (int i = 0; i < 5; i++) {
             try {
                 
                 // Create driver
-                WebDriver driver = new ChromeDriver();
+                driver = new ChromeDriver();
                 driver.manage().window().maximize();
-                logger.info("Browser window ID: " + driver.getWindowHandle());
+                browserIDHandler = driver.getWindowHandle();
+                logger.info("Browser window ID: " + browserIDHandler);
 
                 // Open the page
                 driver.get(QIMA_TARGET_URL);
@@ -42,7 +47,7 @@ public class AQLTest {
                 report.startReport("--------------------ROUND ["+ (i+1) +"]--------------------");
                 // Enter a random positive integer QUANTITY (>=2)
                 Random random = new Random();
-                int quantity = random.nextInt(100000) + 2;
+                int quantity = random.nextInt(LIMIT_RADOM_BOUND) + 2;
                 
                 driver.findElement(By.name("aql-calculator-quantity")).sendKeys(String.valueOf(quantity));
                 logger.info("Entering quantity: " + quantity);
@@ -103,9 +108,14 @@ public class AQLTest {
                 validations ("MINOR",driver, report, quantity, inspectionLevel, minorDefectsAQL);
 
                 // Close the WebDriver
-                driver.close();
+                driver.quit();
                 logger.info("WebDriver closed");
             } catch (Exception e) {
+                
+                if (!browserIDHandler.equals(STRING_EMPTY) & (driver != null)){
+                    driver.quit();
+                    logger.info("WebDriver closed by its error (resume next Round)");
+                }
                 report.addError("xxxxx- ROUND ERROR (resume next) -xxxxx");
             }
         }
@@ -119,7 +129,7 @@ public class AQLTest {
     public static void validations(String ACLtype, WebDriver driver, ExecutionReport report, int quantity, String inspectionLevel, String defectsAQL){
 
         // Actual (on screen)
-        String actualSampleSize = driver.findElement(By.id(ACLtype.toLowerCase()+"-sample-size")).getText();
+        String actualSampleSize = driver.findElement(By.id(ACLtype.toLowerCase()+"-sample-size")).getText().replace(",", "");
         String actualAcceptPoint = driver.findElement(By.id(ACLtype.toLowerCase()+"-accept-point")).getText();
         String actualRejectPoint = driver.findElement(By.id(ACLtype.toLowerCase()+"-reject-point")).getText();
 

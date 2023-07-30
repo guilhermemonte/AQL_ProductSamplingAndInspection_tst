@@ -13,7 +13,7 @@ public class Evaluate {
     private String _inspectionLevel;
     private String _defectsAQL;
 
-    private static final String DATATABLES_FILE_ADDRESS = "C:/VSWorkspace/QIMA/AQLTest/inputData/DataTables.xlsx";
+    private static final String DATATABLES_FILE_ADDRESS = System.getProperty("user.dir")+"\\AQLTest\\inputData\\DataTables.xlsx";
     private static final String DATATABLES_TABLE_A_NAME = "TableA";
     private static final String DATATABLES_TABLE_B_NAME = "TableB";
 

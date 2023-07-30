@@ -23,7 +23,7 @@ public class ExecutionReport {
         SimpleDateFormat sdf = new SimpleDateFormat("YYYYMMDD_HHmmss");
         String timestamp = sdf.format(timestampMillis);
         // Initialize ExtentReports with a path to store the report
-        this.filePathName = "C:/VSWorkspace/QIMA/AQLTest/outputReport/AQLtstReport"+timestamp+".html";
+        this.filePathName = System.getProperty("user.dir")+"\\AQLTest\\outputReport\\AQLtstReport"+timestamp+".html";
         ExtentHtmlReporter htmlReporter = 
             new ExtentHtmlReporter(this.filePathName);
         
